@@ -15,8 +15,6 @@ typedef struct {
     unsigned char b;
 } Pixel;
 
-char out_format = '3';
-
 FILE* sourcefp;
 FILE* outputfp;
 char format[8];
@@ -26,7 +24,6 @@ int mc;
 char height[8];
 char width[8];
 char maxcolor[8];
-char* source = "imageP6.ppm";
 unsigned char* data;
 
 void write_data_to_buffer();
@@ -36,14 +33,14 @@ void output_p6();
 /*
  * 
  */
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
 
     if (argc != 4) {
         fprintf(stderr, "Error: Arguments should be in format: 'format' 'source' 'dest'.");
         return(1);
     }
     
-    sourcefp = fopen(source, "r");
+    sourcefp = fopen(argv[2], "r");
     
     if (!sourcefp) {
         fprintf(stderr, "Error: File not found.");
@@ -52,7 +49,7 @@ int main(int argc, char** argv) {
     
     fscanf(sourcefp, "%s", format);
     if (format[0] != 'P' || (format[1] != '3' && format[1] != '6')) {
-        fprintf(stderr, "Error: Invalid image format. '%s' needs to be either 'P3' or 'P6'.", source);
+        fprintf(stderr, "Error: Invalid image format. '%s' needs to be either 'P3' or 'P6'.", argv[2]);
         return(1);
     }
     
@@ -82,8 +79,8 @@ int main(int argc, char** argv) {
     write_data_to_buffer(h, w);
     fclose(sourcefp);
     
-    outputfp = fopen("output.ppm", "w");
-    if (out_format == '3')
+    outputfp = fopen(argv[3], "w");
+    if (atoi(argv[1]) == 3)
         output_p3();
     else
         output_p6();
@@ -111,16 +108,16 @@ void write_data_to_buffer() {
 }
 
 void output_p3() {
-    fprintf(output, "P3\n");
-    fprintf(output, "%s %s\n", height, width);
-    fprintf(output, "%s\n", maxcolor);
+    fprintf(outputfp, "P3\n");
+    fprintf(outputfp, "%s %s\n", height, width);
+    fprintf(outputfp, "%s\n", maxcolor);
     for(int i=0; i<(sizeof(Pixel)*h*w); i++)
-        fprintf(output, "%d\n", data[i]);
+        fprintf(outputfp, "%d\n", data[i]);
 }
 
 void output_p6() {
-    fprintf(output, "P6\n");
-    fprintf(output, "%s %s\n", height, width);
-    fprintf(output, "%s\n", maxcolor);
-    fwrite(data, sizeof(Pixel), w*h, output);
+    fprintf(outputfp, "P6\n");
+    fprintf(outputfp, "%s %s\n", height, width);
+    fprintf(outputfp, "%s\n", maxcolor);
+    fwrite(data, sizeof(Pixel), w*h, outputfp);
 }
