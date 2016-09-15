@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #define CHANNEL_SIZE 255
 
 typedef struct {
@@ -55,8 +56,10 @@ int main(int argc, char* argv[]) {
         return(1);
     }
     
-    fgetc(sourcefp);
     c = fgetc(sourcefp);
+    while (isspace(c))
+        c = fgetc(sourcefp);
+    
     if (c == '#') {
         while (c == '#') {
             while (c != '\n')
@@ -65,18 +68,23 @@ int main(int argc, char* argv[]) {
         }
     }
     
+    while (isspace(c))
+        c = fgetc(sourcefp);
+    
     i = 0;
     
-    while (c != ' ') {
+    while (!isspace(c)) {
         width[i] = c;
         c = fgetc(sourcefp);
         i++;
     }
     
     i = 0;
-    c = fgetc(sourcefp);
     
-    while (c != '\n') {
+    while (isspace(c))
+        c = fgetc(sourcefp);
+    
+    while (!isspace(c)) {
         height[i] = c;
         c = fgetc(sourcefp);
         i++;
