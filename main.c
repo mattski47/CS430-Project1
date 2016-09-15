@@ -27,7 +27,7 @@ char c;
 char height[8];
 char width[8];
 char maxcolor[8];
-unsigned char* data;
+Pixel* data;
 
 void read_data_to_buffer();
 void output_p3();
@@ -130,25 +130,31 @@ void read_data_to_buffer() {
     data = malloc(sizeof(Pixel)*h*w);
     
     if (format[1] == '3') {
-        char temp[8];
+        //int temp;
 
-        for(int i=0; i<(sizeof(Pixel)*h*w); i++) {
-            fscanf(sourcefp, "%s", temp);
-            data[i] = (char)atoi(temp);
+        for(int i=0; i<(h*w); i++) {
+            Pixel temp;
+            fscanf(sourcefp, "%d", &temp.r);
+            fscanf(sourcefp, "%d", &temp.g);
+            fscanf(sourcefp, "%d", &temp.b);
+            data[i] = temp;
         }
         
-    } else {
-        for(int i=0; i<(sizeof(Pixel)*h*w); i++)
-            data[i] = fgetc(sourcefp);
-    }
+    } //else {
+        //for(int i=0; i<(h*w); i++)
+            //data[i] = fgetc(sourcefp);
+    //}
 }
 
 void output_p3() {
     fprintf(outputfp, "P3\n");
     fprintf(outputfp, "%s %s\n", height, width);
     fprintf(outputfp, "%s\n", maxcolor);
-    for(int i=0; i<(sizeof(Pixel)*h*w); i++)
-        fprintf(outputfp, "%d\n", data[i]);
+    for(int i=0; i<(h*w); i++){
+        fprintf(outputfp, "%d\n", data[i].r);
+        fprintf(outputfp, "%d\n", data[i].g);
+        fprintf(outputfp, "%d\n", data[i].b);
+    }
 }
 
 void output_p6() {
