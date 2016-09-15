@@ -18,15 +18,17 @@ typedef struct {
 FILE* sourcefp;
 FILE* outputfp;
 char format[8];
+int i;
 int h;
 int w;
 int mc;
+char c;
 char height[8];
 char width[8];
 char maxcolor[8];
 unsigned char* data;
 
-void write_data_to_buffer();
+void read_data_to_buffer();
 void output_p3();
 void output_p6();
 
@@ -53,10 +55,37 @@ int main(int argc, char* argv[]) {
         return(1);
     }
     
-    fscanf(sourcefp, "%s %s", height, width);
+    fgetc(sourcefp);
+    c = fgetc(sourcefp);
+    if (c == '#') {
+        while (c == '#') {
+            while (c != '\n')
+                c = fgetc(sourcefp);
+            c = fgetc(sourcefp);
+        }
+    }
     
-    h = atoi(height);
+    i = 0;
+    
+    while (c != ' ') {
+        width[i] = c;
+        c = fgetc(sourcefp);
+        i++;
+    }
+    
+    i = 0;
+    c = fgetc(sourcefp);
+    
+    while (c != '\n') {
+        height[i] = c;
+        c = fgetc(sourcefp);
+        i++;
+    }
+    
+    printf("%s %s\n", width, height);
+    
     w = atoi(width);
+    h = atoi(height);
     
     if (h < 1 || w < 1) {
         fprintf(stderr, "Error: Invalid dimensions.");
@@ -64,7 +93,6 @@ int main(int argc, char* argv[]) {
     }
     
     fscanf(sourcefp, "%s", maxcolor);
-    
     mc = atoi(maxcolor);
     
     if (mc != CHANNEL_SIZE) {
@@ -76,7 +104,7 @@ int main(int argc, char* argv[]) {
     printf("%d %d\n", h, w);
     printf("%s", maxcolor);
     
-    write_data_to_buffer(h, w);
+    read_data_to_buffer();
     fclose(sourcefp);
     
     outputfp = fopen(argv[3], "w");
@@ -90,21 +118,21 @@ int main(int argc, char* argv[]) {
     return(0);
 }
 
-void write_data_to_buffer() {
-    
+void read_data_to_buffer() {
     data = malloc(sizeof(Pixel)*h*w);
     
     if (format[1] == '3') {
-        char temp[3];
+        char temp[8];
 
         for(int i=0; i<(sizeof(Pixel)*h*w); i++) {
             fscanf(sourcefp, "%s", temp);
             data[i] = (char)atoi(temp);
         }
+        
     } else {
-        fscanf(sourcefp, "%s", data);
+        for(int i=0; i<(sizeof(Pixel)*h*w); i++)
+            data[i] = fgetc(sourcefp);
     }
-    
 }
 
 void output_p3() {
