@@ -112,6 +112,7 @@ int main(int argc, char* argv[]) {
     printf("%d %d\n", h, w);
     printf("%s", maxcolor);
     
+    fgetc(sourcefp);
     read_data_to_buffer();
     fclose(sourcefp);
     
@@ -128,22 +129,24 @@ int main(int argc, char* argv[]) {
 
 void read_data_to_buffer() {
     data = malloc(sizeof(Pixel)*h*w);
+    Pixel temp;
     
     if (format[1] == '3') {
-        //int temp;
-
         for(int i=0; i<(h*w); i++) {
-            Pixel temp;
             fscanf(sourcefp, "%d", &temp.r);
             fscanf(sourcefp, "%d", &temp.g);
             fscanf(sourcefp, "%d", &temp.b);
             data[i] = temp;
         }
         
-    } //else {
-        //for(int i=0; i<(h*w); i++)
-            //data[i] = fgetc(sourcefp);
-    //}
+    } else {
+        for(int i=0; i<(h*w); i++) {
+            temp.r = fgetc(sourcefp);
+            temp.g = fgetc(sourcefp);
+            temp.b = fgetc(sourcefp);
+            data[i] = temp;
+        }
+    }
 }
 
 void output_p3() {
