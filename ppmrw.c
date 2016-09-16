@@ -1,5 +1,5 @@
 /* 
- * File:   main.c
+ * File:   ppmrw.c
  * Author: Matthew
  *
  * Created on September 8, 2016, 1:24 PM
