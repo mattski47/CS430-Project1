@@ -1,6 +1,5 @@
-all: main.c
-	gcc main.c -o main
+all: ppmrw.c
+	gcc ppmrw.c -o ppmrw
 
 clean:
-	rm -rf main *~
-
+	rm -rf ppmrw *~
