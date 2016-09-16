@@ -1,5 +1,5 @@
-# CS430-Project1
-Images
+# CS430-Project1 Images
+ppmrw.c
 
 This application takes in the output format (either 3 or 6), the input file name, and the output file name. It then converts the input file into the output format. 
 
