@@ -24,9 +24,6 @@ int h;
 int w;
 int mc;
 char c;
-char height[8];
-char width[8];
-char maxcolor[8];
 Pixel* data;
 
 void read_data_to_buffer();
@@ -60,48 +57,24 @@ int main(int argc, char* argv[]) {
     while (isspace(c))
         c = fgetc(sourcefp);
     
-    if (c == '#') {
-        while (c == '#') {
-            while (c != '\n')
-                c = fgetc(sourcefp);
+    while (c == '#') {
+        while (c != '\n')
             c = fgetc(sourcefp);
-        }
+        
+        while (isspace(c))
+            c = fgetc(sourcefp);
     }
     
-    while (isspace(c))
-        c = fgetc(sourcefp);
-    
-    i = 0;
-    
-    while (!isspace(c)) {
-        width[i] = c;
-        c = fgetc(sourcefp);
-        i++;
-    }
-    
-    i = 0;
-    
-    while (isspace(c))
-        c = fgetc(sourcefp);
-    
-    while (!isspace(c)) {
-        height[i] = c;
-        c = fgetc(sourcefp);
-        i++;
-    }
-    
-    printf("%s %s\n", width, height);
-    
-    w = atoi(width);
-    h = atoi(height);
+    fseek(sourcefp, -1, SEEK_CUR);
+    fscanf(sourcefp, "%d", &w);
+    fscanf(sourcefp, "%d", &h);
     
     if (h < 1 || w < 1) {
         fprintf(stderr, "Error: Invalid dimensions.");
         return(1);
     }
     
-    fscanf(sourcefp, "%s", maxcolor);
-    mc = atoi(maxcolor);
+    fscanf(sourcefp, "%d", &mc);
     
     if (mc != CHANNEL_SIZE) {
         fprintf(stderr, "Error: Channel size must be 8 bits.");
@@ -110,7 +83,7 @@ int main(int argc, char* argv[]) {
     
     printf("%s\n", format);
     printf("%d %d\n", h, w);
-    printf("%s", maxcolor);
+    printf("%d", mc);
     
     fgetc(sourcefp);
     read_data_to_buffer();
@@ -151,8 +124,8 @@ void read_data_to_buffer() {
 
 void output_p3() {
     fprintf(outputfp, "P3\n");
-    fprintf(outputfp, "%s %s\n", height, width);
-    fprintf(outputfp, "%s\n", maxcolor);
+    fprintf(outputfp, "%d %d\n", h, w);
+    fprintf(outputfp, "%d\n", mc);
     for(int i=0; i<(h*w); i++){
         fprintf(outputfp, "%d\n", data[i].r);
         fprintf(outputfp, "%d\n", data[i].g);
@@ -162,7 +135,7 @@ void output_p3() {
 
 void output_p6() {
     fprintf(outputfp, "P6\n");
-    fprintf(outputfp, "%s %s\n", height, width);
-    fprintf(outputfp, "%s\n", maxcolor);
+    fprintf(outputfp, "%d %d\n", h, w);
+    fprintf(outputfp, "%d\n", mc);
     fwrite(data, sizeof(Pixel), w*h, outputfp);
 }
