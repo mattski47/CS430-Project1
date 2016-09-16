@@ -18,7 +18,7 @@ typedef struct {
 
 FILE* sourcefp;
 FILE* outputfp;
-char format[8];
+char format;
 int i;
 int h;
 int w;
@@ -30,9 +30,6 @@ void read_data_to_buffer();
 void output_p3();
 void output_p6();
 
-/*
- * 
- */
 int main(int argc, char* argv[]) {
 
     if (argc != 4) {
@@ -47,13 +44,20 @@ int main(int argc, char* argv[]) {
         return(1);
     }
     
-    fscanf(sourcefp, "%s", format);
-    if (format[0] != 'P' || (format[1] != '3' && format[1] != '6')) {
+    if (fgetc(sourcefp) != 'P') {
+        fprintf(stderr, "Error: Invalid image format. '%s' needs to be either 'P3' or 'P6'.", argv[2]);
+        return(1);
+    }
+    
+    format = fgetc(sourcefp);
+    
+    if (format != '3' && format != '6') {
         fprintf(stderr, "Error: Invalid image format. '%s' needs to be either 'P3' or 'P6'.", argv[2]);
         return(1);
     }
     
     c = fgetc(sourcefp);
+    
     while (isspace(c))
         c = fgetc(sourcefp);
     
@@ -68,22 +72,16 @@ int main(int argc, char* argv[]) {
     fseek(sourcefp, -1, SEEK_CUR);
     fscanf(sourcefp, "%d", &w);
     fscanf(sourcefp, "%d", &h);
-    
     if (h < 1 || w < 1) {
         fprintf(stderr, "Error: Invalid dimensions.");
         return(1);
     }
     
     fscanf(sourcefp, "%d", &mc);
-    
     if (mc != CHANNEL_SIZE) {
         fprintf(stderr, "Error: Channel size must be 8 bits.");
         return(1);
     }
-    
-    printf("%s\n", format);
-    printf("%d %d\n", h, w);
-    printf("%d", mc);
     
     fgetc(sourcefp);
     read_data_to_buffer();
@@ -104,7 +102,7 @@ void read_data_to_buffer() {
     data = malloc(sizeof(Pixel)*h*w);
     Pixel temp;
     
-    if (format[1] == '3') {
+    if (format == '3') {
         for(int i=0; i<(h*w); i++) {
             fscanf(sourcefp, "%d", &temp.r);
             fscanf(sourcefp, "%d", &temp.g);
